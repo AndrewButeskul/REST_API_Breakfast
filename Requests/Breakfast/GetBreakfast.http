@@ -1,0 +1,6 @@
+@id=18d5295f-23c7-426f-be47-4c572388dde7
+@KubeBreakfast_HostAddress = http://localhost:5208
+
+GET {{KubeBreakfast_HostAddress}}/breakfast/{{id}}
+Content-Type: application/json
+

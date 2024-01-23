@@ -1,0 +1,23 @@
+@KubeBreakfast_HostAddress = http://localhost:5208
+
+POST {{KubeBreakfast_HostAddress}}/breakfast/
+Content-Type: application/json
+
+{
+    "name": "Vegan Soup",
+    "description": "Vegan everything! Join us for a healthy breakfast..",
+    "startDateTime": "2024-01-21T08:00:00",
+    "endDateTime": "2024-01-21T11:00:00",
+    "Meal": [
+        "Oatmeal",
+        "Avocado Toast",
+        "Omelette",
+        "Soup"
+    ],
+    "Sweet": [
+        "Fruits"
+    ]
+}
+
+###
+//GET http://localhost:5208/Breakfast/aa709b28-3c72-43cc-be30-3361a92ee7b9
