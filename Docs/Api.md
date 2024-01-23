@@ -1,4 +1,4 @@
-# Buber Breakfast API
+# Breakfast API
 
 - [Kube Breakfast API](#buber-breakfast-api)
   - [Create Breakfast](#create-breakfast)

@@ -2,8 +2,9 @@
 using KubeBreakfast.Contracts.Breakfast;
 using KubeBreakfast.Models;
 using KubeBreakfast.Services.Breakfasts;
+using KubeBreakfast.ServiceErrors;
 
-namespace KubeBreakfast;
+namespace KubeBreakfast.Controllers;
 
 [ApiController]
 [Route("[controller]")]
@@ -47,8 +48,13 @@ public class BreakfastController : ControllerBase
     [HttpGet("{id:guid}")]
     public IActionResult GetBreakfast(Guid id)
     {
-        var breakfast = _breakfastService.GetBreakfast(id);
-
+        var getBreakfastRes = _breakfastService.GetBreakfast(id);
+        if(getBreakfastRes.IsError &&
+        getBreakfastRes.FirstError == Errors.Breakfast.NotFound)
+            return NotFound();
+        
+        var breakfast = getBreakfastRes.Value;
+        // and map:
         var response = new BreakfastResponse(
             breakfast.Id,
             breakfast.Name,

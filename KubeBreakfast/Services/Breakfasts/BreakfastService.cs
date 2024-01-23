@@ -1,4 +1,6 @@
-﻿using KubeBreakfast.Models;
+﻿using ErrorOr;
+using KubeBreakfast.Models;
+using KubeBreakfast.ServiceErrors;
 
 namespace KubeBreakfast.Services.Breakfasts;
 
@@ -16,9 +18,13 @@ public class BreakfastService : IBreakfastService
         _breakfast.Remove(id);
     }
 
-    public Breakfast GetBreakfast(Guid id)
+    public ErrorOr<Breakfast> GetBreakfast(Guid id)
     {
-        return _breakfast[id];
+        if(_breakfast.TryGetValue(id, out var breakfast))
+        {
+            return breakfast;
+        }
+        return Errors.Breakfast.NotFound;
     }
 
     public void UpsertBreakfast(Breakfast breakfast)
