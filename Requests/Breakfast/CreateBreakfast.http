@@ -4,10 +4,10 @@ POST {{KubeBreakfast_HostAddress}}/breakfast/
 Content-Type: application/json
 
 {
-    "name": "Vegan Soup",
+    "name": "Vegan Snack",
     "description": "Vegan everything! Join us for a healthy breakfast..",
-    "startDateTime": "2024-01-21T08:00:00",
-    "endDateTime": "2024-01-21T11:00:00",
+    "startDateTime": "2024-01-22T08:00:00",
+    "endDateTime": "2024-01-22T11:00:00",
     "Meal": [
         "Oatmeal",
         "Avocado Toast",

@@ -8,14 +8,16 @@ public class BreakfastService : IBreakfastService
 {
     // TODO: implement supporting EF Core or sth other
     private static readonly Dictionary<Guid, Breakfast> _breakfast = new();
-    public void CreateBreakfast(Breakfast breakfast)
+    public ErrorOr<Created> CreateBreakfast(Breakfast breakfast)
     {
         _breakfast.Add(breakfast.Id, breakfast);
+        return Result.Created;
     }
 
-    public void DeleteBreakfast(Guid id)
+    public ErrorOr<Deleted> DeleteBreakfast(Guid id)
     {
         _breakfast.Remove(id);
+        return Result.Deleted;
     }
 
     public ErrorOr<Breakfast> GetBreakfast(Guid id)
@@ -27,8 +29,10 @@ public class BreakfastService : IBreakfastService
         return Errors.Breakfast.NotFound;
     }
 
-    public void UpsertBreakfast(Breakfast breakfast)
+    public ErrorOr<UpsertedBreakfast> UpsertBreakfast(Breakfast breakfast)
     {
+        var IsNewlyCreated = !_breakfast.ContainsKey(breakfast.Id);
         _breakfast[breakfast.Id] = breakfast;
+        return new UpsertedBreakfast(IsNewlyCreated);
     }
 }

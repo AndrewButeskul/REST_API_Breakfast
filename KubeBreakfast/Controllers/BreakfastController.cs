@@ -3,12 +3,11 @@ using KubeBreakfast.Contracts.Breakfast;
 using KubeBreakfast.Models;
 using KubeBreakfast.Services.Breakfasts;
 using KubeBreakfast.ServiceErrors;
+using ErrorOr;
 
 namespace KubeBreakfast.Controllers;
 
-[ApiController]
-[Route("[controller]")]
-public class BreakfastController : ControllerBase
+public class BreakfastController : ApiController
 {
     private readonly IBreakfastService _breakfastService;
 
@@ -29,47 +28,27 @@ public class BreakfastController : ControllerBase
             DateTime.UtcNow,
             request.Meal,
             request.Sweet);
-        // TODO: upgrate to using database 
-        _breakfastService.CreateBreakfast(breakfast);
 
-        var response = new BreakfastResponse(
-            breakfast.Id,
-            breakfast.Name,
-            breakfast.Description,
-            breakfast.StartDateTime,
-            breakfast.EndDateTime,
-            breakfast.LastModifiedDateTime,
-            breakfast.Meal,
-            breakfast.Sweet);
-        
-        return CreatedAtAction(nameof(GetBreakfast), new{id = breakfast.Id}, response);
+        ErrorOr<Created> createdBreakfast = _breakfastService.CreateBreakfast(breakfast);
+
+        return createdBreakfast.Match(
+            created => CreatedAtBreakfastResult(breakfast),
+            errors => Problem(errors)
+        );
     }
 
     [HttpGet("{id:guid}")]
     public IActionResult GetBreakfast(Guid id)
     {
-        var getBreakfastRes = _breakfastService.GetBreakfast(id);
-        if(getBreakfastRes.IsError &&
-        getBreakfastRes.FirstError == Errors.Breakfast.NotFound)
-            return NotFound();
-        
-        var breakfast = getBreakfastRes.Value;
-        // and map:
-        var response = new BreakfastResponse(
-            breakfast.Id,
-            breakfast.Name,
-            breakfast.Description,
-            breakfast.StartDateTime,
-            breakfast.EndDateTime,
-            breakfast.LastModifiedDateTime,
-            breakfast.Meal,
-            breakfast.Sweet);
+        ErrorOr<Breakfast> getBreakfast = _breakfastService.GetBreakfast(id);
 
-        return Ok(response);
+        return getBreakfast.Match(
+            breakfast => Ok(MapBreakfastResponse(breakfast)),
+            errors => Problem(errors));
     }
-
+    
     [HttpPut("{id:guid}")]
-    public IActionResult UpdateBreakfast(Guid id, UpsertBreakfastRequest request)
+    public IActionResult UpsertBreakfast(Guid id, UpsertBreakfastRequest request)
     {
         var breakfast = new Breakfast(
             id,
@@ -82,16 +61,42 @@ public class BreakfastController : ControllerBase
             request.Sweet
         );
 
-        _breakfastService.UpsertBreakfast(breakfast);
+        ErrorOr<UpsertedBreakfast> upsertedBreakfast = _breakfastService.UpsertBreakfast(breakfast);
 
         // TODO: return 201 if a new breakfast was created
-        return NoContent();
+        return upsertedBreakfast.Match(
+            upserted => upserted.IsNewlyCreated ? CreatedAtBreakfastResult(breakfast) : NoContent(),
+            errors => Problem(errors)
+        );
     }
 
     [HttpDelete("{id:guid}")]
     public IActionResult DeleteBreakfast(Guid id)
     {
-        _breakfastService.DeleteBreakfast(id);
-        return NoContent();
+        ErrorOr<Deleted> deletedBreakfast = _breakfastService.DeleteBreakfast(id);
+
+        return deletedBreakfast.Match(
+            deleted => NoContent(),
+            errors => Problem(errors)
+        );
+    }
+    private static BreakfastResponse MapBreakfastResponse(Breakfast breakfast)
+    {
+        return new BreakfastResponse(
+            breakfast.Id,
+            breakfast.Name,
+            breakfast.Description,
+            breakfast.StartDateTime,
+            breakfast.EndDateTime,
+            breakfast.LastModifiedDateTime,
+            breakfast.Meal,
+            breakfast.Sweet);
+    }
+    private IActionResult CreatedAtBreakfastResult(Breakfast breakfast)
+    {
+        return CreatedAtAction(
+            nameof(GetBreakfast),
+            new { id = breakfast.Id },
+            MapBreakfastResponse(breakfast));
     }
 }
