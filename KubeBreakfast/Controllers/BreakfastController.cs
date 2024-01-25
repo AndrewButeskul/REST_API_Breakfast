@@ -19,16 +19,21 @@ public class BreakfastController : ApiController
     [HttpPost]
     public IActionResult CreateBreakfast(CreateBreakfastRequest request)
     {
-        var breakfast = new Breakfast(
-            Guid.NewGuid(),
+        // Validation:
+        var requestToBreakfast = Breakfast.Create(
             request.Name,
             request.Description,
             request.StartDateTime,
             request.EndDateTime,
-            DateTime.UtcNow,
             request.Meal,
             request.Sweet);
+        
+        if(requestToBreakfast.IsError)
+            return Problem(requestToBreakfast.Errors);
 
+        var breakfast = requestToBreakfast.Value;
+
+        // Designing:
         ErrorOr<Created> createdBreakfast = _breakfastService.CreateBreakfast(breakfast);
 
         return createdBreakfast.Match(
@@ -50,16 +55,20 @@ public class BreakfastController : ApiController
     [HttpPut("{id:guid}")]
     public IActionResult UpsertBreakfast(Guid id, UpsertBreakfastRequest request)
     {
-        var breakfast = new Breakfast(
-            id,
+        var requestToBreakfast = Breakfast.Create(
             request.Name,
             request.Description,
             request.StartDateTime,
             request.EndDateTime,
-            DateTime.UtcNow,
             request.Meal,
-            request.Sweet
+            request.Sweet,
+            id
         );
+
+        if(requestToBreakfast.IsError)
+            return Problem(requestToBreakfast.Errors);
+
+        var breakfast = requestToBreakfast.Value;
 
         ErrorOr<UpsertedBreakfast> upsertedBreakfast = _breakfastService.UpsertBreakfast(breakfast);
 
