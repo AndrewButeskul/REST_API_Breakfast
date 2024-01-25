@@ -10,5 +10,14 @@ public static class Errors
             "Unfortunately, the breakfast with such 'id' not found"
         );
 
+        public static Error InvalidName => Error.Validation(
+            "Breakfast.InvalidName",
+            $"Name must be more than {Models.Breakfast.MinLengthForName} characters but less that {Models.Breakfast.MaxLengthForName}"
+        );
+
+        public static Error InvalidDescription => Error.Validation(
+            "Breakfast.InvalidDescription",
+            $"Description must be more than {Models.Breakfast.MinLengthForDescription} characters but less that {Models.Breakfast.MaxLengthForDescription}"
+        );
     }
 }

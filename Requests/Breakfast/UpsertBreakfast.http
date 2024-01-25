@@ -1,10 +1,10 @@
 @KubeBreakfast_HostAddress = http://localhost:5208
-@id=56636bcb-ca5a-4aac-ac77-79527de5cbda
+@id=1835d5f6-9e8c-4c5d-86b5-1200ed7e983a
 PUT {{KubeBreakfast_HostAddress}}/breakfast/{{id}}
 Content-Type: application/json
 
 {
-    "name": "Vegan Sunshine",
+    "name": "Vegan Rolls",
     "description": "Vegan everything! Join us for a healthy breakfast..",
     "startDateTime": "2024-01-23T08:00:00",
     "endDateTime": "2024-01-23T11:00:00",
